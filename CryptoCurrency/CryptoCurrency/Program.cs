@@ -1,6 +1,17 @@
-﻿public class Converter {
+﻿using System.Collections.Generic;
+
+public class Converter
+{
+    public Dictionary<string, double> Currencies { get; set; }
     //Main method
-    public static void Main(string[] args) {}
+    public static void Main(string[] args)
+    {
+    }
+
+    public Converter()
+    {
+        Currencies = new Dictionary<string, double>();
+    }
 
     /// <summary>
     /// Angiver prisen for en enhed af en kryptovaluta. Prisen angives i dollars.
@@ -9,8 +20,31 @@
     /// </summary>
     /// <param name="currencyName">Navnet på den kryptovaluta der angives</param>
     /// <param name="price">Prisen på en enhed af valutaen målt i dollars. Prisen kan ikke være negativ</param>
-    public void SetPricePerUnit(String currencyName, double price) {
+    public void SetPricePerUnit(String currencyName, double price)
+    {
+        // Prisen kan ikke være negativ!
+        if (price < 0)
+        {
+            throw new System.ArgumentException("Prisen kan ikke være negativ");
+        }
+        // Opdater pris på valutaen, hvis den allerede findes
+        if (Currencies.ContainsKey(currencyName))
+        {
+            Currencies[currencyName] = price;
+        }
+        else
+        {
+            Currencies.Add(currencyName, price);
+        }
+    }
 
+    public double GetPricePerUnit(String currencyName)
+    {
+        if (Currencies.ContainsKey(currencyName) == false)
+        {
+            throw new System.ArgumentException($"Valutaen findes ikke: {currencyName}.");
+        }
+        return Currencies[currencyName];
     }
 
     /// <summary>
@@ -22,7 +56,11 @@
     /// <param name="toCurrencyName">Navnet på den valuta, der konverteres til</param>
     /// <param name="amount">Beløbet angivet i valutaen angivet i fromCurrencyName</param>
     /// <returns>Værdien af beløbet i toCurrencyName</returns>
-    public double Convert(String fromCurrencyName, String toCurrencyName, double amount) {
-        return 0;
+    public double Convert(String fromCurrencyName, String toCurrencyName, double amount)
+    {
+        double fromCurrencyPrice = GetPricePerUnit(fromCurrencyName);
+        double toCurrencyPrice = GetPricePerUnit(toCurrencyName);
+        double totalCurrencyPriceFrom = fromCurrencyPrice * amount;
+        return totalCurrencyPriceFrom / toCurrencyPrice;
     }
 }
